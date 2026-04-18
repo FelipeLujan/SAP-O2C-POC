@@ -179,14 +179,179 @@ body
   "Soldtoparty": "17100003"
 }
 ```
+this step returned sales order number 6319. 
 
 this creates the the sales order record without any item. Then we can add items to the sales order by using the tool
 PostASalesorder___salesorder___ToItem
 body
 ```json
 {
-  "Material": "MAT1710",
-  "Requestedquantity": "10",
-  "Requestedquantityunit": "PC"
+  "Material": "TG11",
+  "Requestedquantity": "5",
+  "Requestedquantityunit": "PC",
+  "Plant": "1710",
 }
 ``` 
+
+Response: 
+```json
+API Response (Status: 201):
+{
+  "d": {
+    "__metadata": {
+      "id": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')",
+      "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')",
+      "type": "API_SALES_ORDER_SRV.A_SalesOrderItemType"
+    },
+    "SalesOrder": "6319",
+    "SalesOrderItem": "20",
+    "HigherLevelItem": "0",
+    "HigherLevelItemUsage": "",
+    "SalesOrderItemCategory": "TATX",
+    "SalesOrderItemText": "",
+    "PurchaseOrderByCustomer": "",
+    "PurchaseOrderByShipToParty": "17100003",
+    "UnderlyingPurchaseOrderItem": "",
+    "ExternalItemID": "",
+    "Material": "",
+    "OriginallyRequestedMaterial": "",
+    "MaterialByCustomer": "",
+    "PricingDate": "/Date(1776470400000)/",
+    "PricingReferenceMaterial": "",
+    "BillingPlan": "",
+    "RequestedQuantity": "5.000",
+    "RequestedQuantityUnit": "PC",
+    "RequestedQuantitySAPUnit": "",
+    "RequestedQuantityISOUnit": "",
+    "OrderQuantityUnit": "",
+    "OrderQuantitySAPUnit": "",
+    "OrderQuantityISOUnit": "",
+    "ConfdDelivQtyInOrderQtyUnit": "0.000",
+    "ItemGrossWeight": "0.000",
+    "ItemNetWeight": "0.000",
+    "ItemWeightUnit": "",
+    "ItemWeightSAPUnit": "",
+    "ItemWeightISOUnit": "",
+    "ItemVolume": "0.000",
+    "ItemVolumeUnit": "",
+    "ItemVolumeSAPUnit": "",
+    "ItemVolumeISOUnit": "",
+    "TransactionCurrency": "USD",
+    "NetAmount": "0.00",
+    "TotalSDDocReferenceStatus": "",
+    "SDDocReferenceStatus": "",
+    "MaterialSubstitutionReason": "",
+    "MaterialGroup": "",
+    "MaterialPricingGroup": "",
+    "AdditionalMaterialGroup1": "",
+    "AdditionalMaterialGroup2": "",
+    "AdditionalMaterialGroup3": "",
+    "AdditionalMaterialGroup4": "",
+    "AdditionalMaterialGroup5": "",
+    "BillingDocumentDate": "/Date(1776470400000)/",
+    "ContractAccount": "",
+    "AdditionalValueDays": "0",
+    "ServicesRenderedDate": null,
+    "Batch": "",
+    "ProductionPlant": "1710",
+    "OriginalPlant": "",
+    "AltvBsdConfSubstitutionStatus": "",
+    "StorageLocation": "",
+    "DeliveryGroup": "0",
+    "ShippingPoint": "",
+    "ShippingType": "",
+    "DeliveryPriority": "2",
+    "DeliveryDateQuantityIsFixed": false,
+    "DeliveryDateTypeRule": "",
+    "IncotermsClassification": "EXW",
+    "IncotermsTransferLocation": "Palo Alto",
+    "IncotermsLocation1": "Palo Alto",
+    "IncotermsLocation2": "",
+    "TaxAmount": "0.00",
+    "ProductTaxClassification1": "",
+    "ProductTaxClassification2": "",
+    "ProductTaxClassification3": "",
+    "ProductTaxClassification4": "",
+    "ProductTaxClassification5": "",
+    "ProductTaxClassification6": "",
+    "ProductTaxClassification7": "",
+    "ProductTaxClassification8": "",
+    "ProductTaxClassification9": "",
+    "MatlAccountAssignmentGroup": "",
+    "CostAmount": "0.00",
+    "CustomerPaymentTerms": "0004",
+    "FixedValueDate": null,
+    "CustomerGroup": "01",
+    "SalesDocumentRjcnReason": "",
+    "ItemBillingBlockReason": "",
+    "SlsDocIsRlvtForProofOfDeliv": true,
+    "WBSElement": "",
+    "ProfitCenter": "",
+    "AccountingExchangeRate": "0.00000",
+    "ReferenceSDDocument": "",
+    "ReferenceSDDocumentItem": "0",
+    "CorrespncExternalReference": "",
+    "POCorrespncExternalReference": "",
+    "CustomerConditionGroup1": "",
+    "CustomerConditionGroup2": "",
+    "CustomerConditionGroup3": "",
+    "CustomerConditionGroup4": "",
+    "CustomerConditionGroup5": "",
+    "SDProcessStatus": "",
+    "DeliveryStatus": "",
+    "OrderRelatedBillingStatus": "",
+    "Subtotal1Amount": "0.00",
+    "Subtotal2Amount": "0.00",
+    "Subtotal3Amount": "0.00",
+    "Subtotal4Amount": "0.00",
+    "Subtotal5Amount": "0.00",
+    "Subtotal6Amount": "0.00",
+    "RequirementSegment": "",
+    "to_BillingPlan": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_BillingPlan"
+      }
+    },
+    "to_Partner": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_Partner"
+      }
+    },
+    "to_PrecedingProcFlowDocItem": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_PrecedingProcFlowDocItem"
+      }
+    },
+    "to_PricingElement": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_PricingElement"
+      }
+    },
+    "to_RelatedObject": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_RelatedObject"
+      }
+    },
+    "to_SalesOrder": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_SalesOrder"
+      }
+    },
+    "to_ScheduleLine": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_ScheduleLine"
+      }
+    },
+    "to_SubsequentProcFlowDocItem": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_SubsequentProcFlowDocItem"
+      }
+    },
+    "to_Text": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_Text"
+      }
+    }
+  }
+}
+```
