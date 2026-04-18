@@ -186,172 +186,168 @@ PostASalesorder___salesorder___ToItem
 body
 ```json
 {
-  "Material": "TG11",
-  "Requestedquantity": "5",
+  "Material": "PUMP_MOTOR_KE",
+  "Requestedquantity": "2",
   "Requestedquantityunit": "PC",
   "Plant": "1710",
 }
 ``` 
+PUMP_MOTOR_KE has an item price of 835 USD 
 
 Response: 
+
 ```json
-API Response (Status: 201):
 {
   "d": {
     "__metadata": {
-      "id": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')",
-      "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')",
-      "type": "API_SALES_ORDER_SRV.A_SalesOrderItemType"
+      "id": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')",
+      "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')",
+      "type": "API_SALES_ORDER_SRV.A_SalesOrderType",
+      "etag": "W/\"datetimeoffset'2026-04-18T20%3A23%3A29.5937010Z'\""
     },
     "SalesOrder": "6319",
-    "SalesOrderItem": "20",
-    "HigherLevelItem": "0",
-    "HigherLevelItemUsage": "",
-    "SalesOrderItemCategory": "TATX",
-    "SalesOrderItemText": "",
+    "SalesOrderType": "OR",
+    "SalesOrganization": "1710",
+    "DistributionChannel": "10",
+    "OrganizationDivision": "00",
+    "SalesGroup": "",
+    "SalesOffice": "",
+    "SalesDistrict": "",
+    "SoldToParty": "17100003",
+    "CreationDate": "/Date(1776470400000)/",
+    "CreatedByUser": "BPINST",
+    "LastChangeDate": "/Date(1776470400000)/",
+    "SenderBusinessSystemName": "",
+    "ExternalDocumentID": "",
+    "LastChangeDateTime": "/Date(1776543809593+0000)/",
+    "ExternalDocLastChangeDateTime": null,
     "PurchaseOrderByCustomer": "",
     "PurchaseOrderByShipToParty": "17100003",
-    "UnderlyingPurchaseOrderItem": "",
-    "ExternalItemID": "",
-    "Material": "",
-    "OriginallyRequestedMaterial": "",
-    "MaterialByCustomer": "",
-    "PricingDate": "/Date(1776470400000)/",
-    "PricingReferenceMaterial": "",
-    "BillingPlan": "",
-    "RequestedQuantity": "5.000",
-    "RequestedQuantityUnit": "PC",
-    "RequestedQuantitySAPUnit": "",
-    "RequestedQuantityISOUnit": "",
-    "OrderQuantityUnit": "",
-    "OrderQuantitySAPUnit": "",
-    "OrderQuantityISOUnit": "",
-    "ConfdDelivQtyInOrderQtyUnit": "0.000",
-    "ItemGrossWeight": "0.000",
-    "ItemNetWeight": "0.000",
-    "ItemWeightUnit": "",
-    "ItemWeightSAPUnit": "",
-    "ItemWeightISOUnit": "",
-    "ItemVolume": "0.000",
-    "ItemVolumeUnit": "",
-    "ItemVolumeSAPUnit": "",
-    "ItemVolumeISOUnit": "",
+    "CustomerPurchaseOrderType": "",
+    "CustomerPurchaseOrderDate": null,
+    "SalesOrderDate": "/Date(1776470400000)/",
+    "TotalNetAmount": "1670.00",
+    "OverallDeliveryStatus": "A",
+    "TotalBlockStatus": "",
+    "OverallOrdReltdBillgStatus": "",
+    "OverallSDDocReferenceStatus": "",
     "TransactionCurrency": "USD",
-    "NetAmount": "0.00",
-    "TotalSDDocReferenceStatus": "",
-    "SDDocReferenceStatus": "",
-    "MaterialSubstitutionReason": "",
-    "MaterialGroup": "",
-    "MaterialPricingGroup": "",
-    "AdditionalMaterialGroup1": "",
-    "AdditionalMaterialGroup2": "",
-    "AdditionalMaterialGroup3": "",
-    "AdditionalMaterialGroup4": "",
-    "AdditionalMaterialGroup5": "",
-    "BillingDocumentDate": "/Date(1776470400000)/",
-    "ContractAccount": "",
-    "AdditionalValueDays": "0",
-    "ServicesRenderedDate": null,
-    "Batch": "",
-    "ProductionPlant": "1710",
-    "OriginalPlant": "",
-    "AltvBsdConfSubstitutionStatus": "",
-    "StorageLocation": "",
-    "DeliveryGroup": "0",
-    "ShippingPoint": "",
+    "SDDocumentReason": "",
+    "PricingDate": "/Date(1776470400000)/",
+    "PriceDetnExchangeRate": "1.00000",
+    "PaymentGuaranteeProcedure": "000002",
+    "BillingPlan": "",
+    "RequestedDeliveryDate": "/Date(1776470400000)/",
+    "ShippingCondition": "01",
+    "CompleteDeliveryIsDefined": false,
     "ShippingType": "",
-    "DeliveryPriority": "2",
-    "DeliveryDateQuantityIsFixed": false,
+    "HeaderBillingBlockReason": "",
+    "DeliveryBlockReason": "",
     "DeliveryDateTypeRule": "",
     "IncotermsClassification": "EXW",
     "IncotermsTransferLocation": "Palo Alto",
     "IncotermsLocation1": "Palo Alto",
     "IncotermsLocation2": "",
-    "TaxAmount": "0.00",
-    "ProductTaxClassification1": "",
-    "ProductTaxClassification2": "",
-    "ProductTaxClassification3": "",
-    "ProductTaxClassification4": "",
-    "ProductTaxClassification5": "",
-    "ProductTaxClassification6": "",
-    "ProductTaxClassification7": "",
-    "ProductTaxClassification8": "",
-    "ProductTaxClassification9": "",
-    "MatlAccountAssignmentGroup": "",
-    "CostAmount": "0.00",
+    "IncotermsVersion": "",
+    "CustomerPriceGroup": "",
+    "PriceListType": "",
     "CustomerPaymentTerms": "0004",
+    "PaymentMethod": "",
     "FixedValueDate": null,
-    "CustomerGroup": "01",
-    "SalesDocumentRjcnReason": "",
-    "ItemBillingBlockReason": "",
-    "SlsDocIsRlvtForProofOfDeliv": true,
-    "WBSElement": "",
-    "ProfitCenter": "",
-    "AccountingExchangeRate": "0.00000",
+    "AssignmentReference": "",
     "ReferenceSDDocument": "",
-    "ReferenceSDDocumentItem": "0",
+    "ReferenceSDDocumentCategory": "",
+    "AccountingDocExternalReference": "",
+    "CustomerAccountAssignmentGroup": "01",
+    "AccountingExchangeRate": "0.00000",
     "CorrespncExternalReference": "",
+    "SlsDocSo2PLastContactPersnName": "",
+    "SlsDocSo2PLstCntctPersnTelNmbr": "999-654-2356",
     "POCorrespncExternalReference": "",
     "CustomerConditionGroup1": "",
     "CustomerConditionGroup2": "",
     "CustomerConditionGroup3": "",
     "CustomerConditionGroup4": "",
     "CustomerConditionGroup5": "",
-    "SDProcessStatus": "",
-    "DeliveryStatus": "",
-    "OrderRelatedBillingStatus": "",
-    "Subtotal1Amount": "0.00",
-    "Subtotal2Amount": "0.00",
-    "Subtotal3Amount": "0.00",
-    "Subtotal4Amount": "0.00",
-    "Subtotal5Amount": "0.00",
-    "Subtotal6Amount": "0.00",
-    "RequirementSegment": "",
+    "CustomerGroup": "01",
+    "AdditionalCustomerGroup1": "",
+    "AdditionalCustomerGroup2": "",
+    "AdditionalCustomerGroup3": "",
+    "AdditionalCustomerGroup4": "",
+    "AdditionalCustomerGroup5": "",
+    "SlsDocIsRlvtForProofOfDeliv": true,
+    "CustomerTaxClassification1": "",
+    "CustomerTaxClassification2": "",
+    "CustomerTaxClassification3": "",
+    "CustomerTaxClassification4": "",
+    "CustomerTaxClassification5": "",
+    "CustomerTaxClassification6": "",
+    "CustomerTaxClassification7": "",
+    "CustomerTaxClassification8": "",
+    "CustomerTaxClassification9": "",
+    "TaxDepartureCountry": "",
+    "VATRegistrationCountry": "",
+    "SalesOrderApprovalReason": "",
+    "SalesDocApprovalStatus": "",
+    "OverallSDProcessStatus": "A",
+    "TotalCreditCheckStatus": "",
+    "OverallTotalDeliveryStatus": "A",
+    "OverallSDDocumentRejectionSts": "A",
+    "BillingDocumentDate": "/Date(1776470400000)/",
+    "ContractAccount": "",
+    "AdditionalValueDays": "0",
+    "CustomerPurchaseOrderSuplmnt": "",
+    "ServicesRenderedDate": null,
     "to_BillingPlan": {
       "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_BillingPlan"
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_BillingPlan"
+      }
+    },
+    "to_Item": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_Item"
       }
     },
     "to_Partner": {
       "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_Partner"
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_Partner"
       }
     },
-    "to_PrecedingProcFlowDocItem": {
+    "to_PaymentPlanItemDetails": {
       "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_PrecedingProcFlowDocItem"
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_PaymentPlanItemDetails"
+      }
+    },
+    "to_PrecedingProcFlowDoc": {
+      "__deferred": {
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_PrecedingProcFlowDoc"
       }
     },
     "to_PricingElement": {
       "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_PricingElement"
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_PricingElement"
       }
     },
     "to_RelatedObject": {
       "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_RelatedObject"
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_RelatedObject"
       }
     },
-    "to_SalesOrder": {
+    "to_SubsequentProcFlowDoc": {
       "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_SalesOrder"
-      }
-    },
-    "to_ScheduleLine": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_ScheduleLine"
-      }
-    },
-    "to_SubsequentProcFlowDocItem": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_SubsequentProcFlowDocItem"
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_SubsequentProcFlowDoc"
       }
     },
     "to_Text": {
       "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrderItem(SalesOrder='6319',SalesOrderItem='20')/to_Text"
+        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_Text"
       }
     }
   }
 }
+
 ```
+
+
+
+apply a discount and shipping fees to the sales order 6319 using 
