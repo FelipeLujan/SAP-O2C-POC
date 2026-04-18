@@ -76,7 +76,7 @@ const toolDefinitionMap: Map<string, McpToolDefinition> = new Map([
   ["PostASalesorder", {
     name: "PostASalesorder",
     description: `Creates a sales order header. Consumers can create a sales order with all possible sub-entities (for example, header partners or items) using deep insert requests or create a single sales order header.`,
-    inputSchema: {"type":"object","properties":{}},
+    inputSchema: {"type":"object","properties":{"requestBody":{"type":"object","properties":{"SalesOrder":{"type":"string","maxLength":10,"title":"Sales Order"},"SalesOrderType":{"type":"string","maxLength":4,"title":"Sales Order Type"},"SalesOrganization":{"type":"string","maxLength":4,"title":"Sales Organization"},"DistributionChannel":{"type":"string","maxLength":2,"title":"Distribution Channel"},"OrganizationDivision":{"type":"string","maxLength":2,"title":"Division"},"SalesGroup":{"type":"string","maxLength":3,"title":"Sales Group"},"SalesOffice":{"type":"string","maxLength":4,"title":"Sales Office"},"SalesDistrict":{"type":"string","maxLength":6,"title":"Sales District"},"SoldToParty":{"type":"string","maxLength":10,"title":"Sold-to Party"},"PurchaseOrderByCustomer":{"type":"string","maxLength":35,"title":"Customer Reference"},"PurchaseOrderByShipToParty":{"type":"string","maxLength":35,"title":"Customer Reference (Ship-to Party)","description":"Ship-to Party's Customer Reference"},"CustomerPurchaseOrderType":{"type":"string","maxLength":4,"title":"Purchase Order Type","description":"Customer Purchase Order Type"},"CustomerPurchaseOrderDate":{"type":"string","title":"Customer Reference Date"},"SalesOrderDate":{"type":"string","title":"Document Date","description":"Document Date (Date Received/Sent)"},"TransactionCurrency":{"type":"string","maxLength":5,"title":"Document Currency","description":"SD Document Currency"},"SDDocumentReason":{"type":"string","maxLength":3,"title":"Order Reason","description":"Order Reason (Reason for the Business Transaction)"},"PricingDate":{"type":"string","title":"Pricing Date","description":"Date for Pricing and Exchange Rate"},"PriceDetnExchangeRate":{"type":"string","title":"Exchange Rate","description":"Exchange Rate for Price Determination"},"BillingPlan":{"type":"string","maxLength":10,"title":"Bill. Plan No.","description":"Billing Plan Number / Invoicing Plan Number"},"RequestedDeliveryDate":{"type":"string","title":"Requested Delivery Date"},"ShippingCondition":{"type":"string","maxLength":2,"title":"Shipping Conditions"},"CompleteDeliveryIsDefined":{"type":"boolean","title":"Complete Delivery","description":"Complete Delivery Defined for Each Sales Order"},"ShippingType":{"type":"string","maxLength":2,"title":"Shipping Type"},"HeaderBillingBlockReason":{"type":"string","maxLength":2,"title":"Billing Block","description":"Billing Block in SD Document"},"DeliveryBlockReason":{"type":"string","maxLength":2,"title":"Delivery Block","description":"Delivery Block (Document Header)"},"DeliveryDateTypeRule":{"type":"string","maxLength":1,"title":"Delivery Date Rule"},"IncotermsClassification":{"type":"string","maxLength":3,"title":"Incoterms","description":"Incoterms (Part 1)"},"IncotermsTransferLocation":{"type":"string","maxLength":28,"title":"Incoterms (Part 2)"},"IncotermsLocation1":{"type":"string","maxLength":70,"title":"Incoterms Location 1"},"IncotermsLocation2":{"type":"string","maxLength":70,"title":"Incoterms Location 2"},"IncotermsVersion":{"type":"string","maxLength":4,"title":"Incoterms Version"},"CustomerPriceGroup":{"type":"string","maxLength":2,"title":"Customer Price Group"},"PriceListType":{"type":"string","maxLength":2,"title":"Price List Type"},"CustomerPaymentTerms":{"type":"string","maxLength":4,"title":"Terms of Payment","description":"Key for Terms of Payment"},"PaymentMethod":{"type":"string","maxLength":1,"title":"Payment Method"},"FixedValueDate":{"type":"string","title":"Fixed Value Date"},"AssignmentReference":{"type":"string","maxLength":18,"title":"Assignment","description":"Assignment Number"},"ReferenceSDDocument":{"type":"string","maxLength":10,"title":"Reference Document","description":"Document Number of Reference Document"},"AccountingDocExternalReference":{"type":"string","maxLength":16,"title":"Reference","description":"Reference Document Number"},"CustomerAccountAssignmentGroup":{"type":"string","maxLength":2,"title":"Account Assignment Group for Customer","description":"Customer Account Assignment Group"},"AccountingExchangeRate":{"type":"string","title":"Exchng. Rate Accntg.","description":"Exchange Rate for Postings to Financial Accounting"},"CustomerGroup":{"type":"string","maxLength":2,"title":"Customer Group"},"AdditionalCustomerGroup1":{"type":"string","maxLength":3,"title":"Customer Group 1"},"AdditionalCustomerGroup2":{"type":"string","maxLength":3,"title":"Customer Group 2"},"AdditionalCustomerGroup3":{"type":"string","maxLength":3,"title":"Customer Group 3"},"AdditionalCustomerGroup4":{"type":"string","maxLength":3,"title":"Customer Group 4"},"AdditionalCustomerGroup5":{"type":"string","maxLength":3,"title":"Customer Group 5"},"SlsDocIsRlvtForProofOfDeliv":{"type":"boolean","title":"Relevant for Proof of Delivery"},"CustomerTaxClassification1":{"type":"string","maxLength":1,"title":"Alt.Tax Classific.","description":"Alternative Tax Classification"},"CustomerTaxClassification2":{"type":"string","maxLength":1,"title":"Tax Class.2 Customer","description":"Tax Classification 2 for Customer"},"CustomerTaxClassification3":{"type":"string","maxLength":1,"title":"Tax Class.3 Customer","description":"Tax Classification 3 for Customer"},"CustomerTaxClassification4":{"type":"string","maxLength":1,"title":"Tax Class.4 Customer","description":"Tax Classification 4 for Customer"},"CustomerTaxClassification5":{"type":"string","maxLength":1,"title":"Tax Class.5 Customer","description":"Tax Classification 5 for Customer"},"CustomerTaxClassification6":{"type":"string","maxLength":1,"title":"Tax Class.6 Customer","description":"Tax Classification 6 for Customer"},"CustomerTaxClassification7":{"type":"string","maxLength":1,"title":"Tax Class.7 Customer","description":"Tax Classification 7 for Customer"},"CustomerTaxClassification8":{"type":"string","maxLength":1,"title":"Tax Class.8 Customer","description":"Tax Classification 8 for Customer"},"CustomerTaxClassification9":{"type":"string","maxLength":1,"title":"Tax Class.9 Customer","description":"Tax Classification 9 for Customer"},"TaxDepartureCountry":{"type":"string","maxLength":3,"title":"Tax Departure Country/Region"},"VATRegistrationCountry":{"type":"string","maxLength":3,"title":"Tax Destination Country/Region","description":"Destination Country/Region for Tax Determination"},"BillingDocumentDate":{"type":"string","title":"Billing Date"},"ContractAccount":{"type":"string","maxLength":12,"title":"Contract Account","description":"Contract Account Number"},"AdditionalValueDays":{"type":"string","maxLength":2,"title":"Addit. Value Days","description":"Additional Value Days"},"CustomerPurchaseOrderSuplmnt":{"type":"string","maxLength":4,"title":"Supplement","description":"Purchase order number supplement"},"ServicesRenderedDate":{"type":"string","title":"Date of Services Rendered","description":"Date on which services are rendered"}},"required":["SalesOrder"],"title":"Sales Order Header (for create)"}},"required":["requestBody"]},
     method: "post",
     pathTemplate: "/A_SalesOrder",
     executionParameters: [],
@@ -1865,9 +1865,16 @@ async function executeApiTool(
     const requestUrl = API_BASE_URL ? `${API_BASE_URL}${urlPath}` : urlPath;
 
     // Handle request body if needed
-    if (definition.requestBodyContentType && typeof validatedArgs['requestBody'] !== 'undefined') {
-        requestBodyData = validatedArgs['requestBody'];
+    if (definition.requestBodyContentType) {
+        // Always set Content-Type when the operation expects a body — SAP OData returns
+        // 415 if Content-Type is absent, even for an empty payload.
         headers['content-type'] = definition.requestBodyContentType;
+        if (typeof validatedArgs['requestBody'] !== 'undefined') {
+            requestBodyData = validatedArgs['requestBody'];
+        } else {
+            // Send a minimal empty JSON object so the server gets a valid Content-Type + body.
+            requestBodyData = definition.requestBodyContentType.includes('json') ? {} : '';
+        }
     }
 
 
@@ -2024,6 +2031,45 @@ async function executeApiTool(
         console.warn(`Tool '${toolName}' requires security: ${securityRequirementsString}, but no suitable credentials found.`);
     }
     
+
+    // Fetch CSRF token for state-changing requests (SAP OData requirement)
+    const mutatingMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+    if (mutatingMethods.includes(definition.method.toUpperCase())) {
+        try {
+            console.error(`Fetching CSRF token for ${definition.method.toUpperCase()} request to ${requestUrl}`);
+            // Use HEAD on the service root — avoids payload but still triggers token issuance.
+            // validateStatus accepts all HTTP codes so 4xx/5xx don't throw and the token is
+            // never silently dropped.
+            const csrfResponse = await axios({
+                method: 'HEAD',
+                url: API_BASE_URL,
+                headers: { ...headers, 'x-csrf-token': 'Fetch' },
+                validateStatus: () => true,
+            });
+            console.error(`CSRF fetch status: ${csrfResponse.status}`);
+            console.error(`CSRF fetch response headers: ${JSON.stringify(csrfResponse.headers)}`);
+            const csrfToken = csrfResponse.headers['x-csrf-token'];
+            if (csrfToken && csrfToken.toLowerCase() !== 'required') {
+                headers['x-csrf-token'] = csrfToken;
+                // Forward any session cookies returned with the token — SAP validates
+                // that the cookie session and the CSRF token originate from the same request.
+                const setCookie = csrfResponse.headers['set-cookie'];
+                if (setCookie) {
+                    const setCookieArr: string[] = Array.isArray(setCookie) ? setCookie : [setCookie];
+                    const cookieStr = setCookieArr.map((c: string) => c.split(';')[0]).join('; ');
+                    headers['cookie'] = headers['cookie']
+                        ? `${headers['cookie']}; ${cookieStr}`
+                        : cookieStr;
+                }
+                console.error(`CSRF token acquired: ${csrfToken}`);
+            } else {
+                console.error(`CSRF token not returned by server (got: ${csrfToken}), proceeding without it`);
+            }
+        } catch (csrfError: unknown) {
+            const msg = csrfError instanceof Error ? csrfError.message : String(csrfError);
+            console.error(`Warning: failed to fetch CSRF token: ${msg}. Proceeding without it.`);
+        }
+    }
 
     // Prepare the axios request configuration
     const config: AxiosRequestConfig = {
