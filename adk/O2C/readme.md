@@ -4,13 +4,13 @@ implement an agent team composed of:
   - sales order creator
 
 ## sales supervisor agent
-- model: Gemini 3.1 Pro
+- model: gemini-3.1-pro
 - subagents:
   - sales reviewer agent
   - sales order creator agent
 
 ## sales reviewer agent
-- model: Gemini 3.1 flash
+- model: gemini-3.1-flash
 - tools: `GetASalesorder`, `GetASalesorder___salesorder___ToItem`, `GetASalesorder___salesorder___ToPartner`, `GetASalesorder___salesorder___ToPricingelement`, `GetASalesorder___salesorder___ToText`, `GetASalesorder___salesorder___ToBillingplan`, `GetASalesorder___salesorder___ToPaymentplanitemdetails`, `GetASalesorder___salesorder___ToPrecedingprocflowdoc`, `GetASalesorder___salesorder___ToRelatedobject`, `GetASalesorder___salesorder___ToSubsequentprocflowdoc`
 - prompt: |
     You are a Sales Order Review Agent with read-only access to the SAP Sales Order API (API_SALES_ORDER_SRV).
@@ -48,7 +48,7 @@ implement an agent team composed of:
     5. **Flags / Alerts** – highlight any blocking reasons, rejection statuses, or anomalies.
 
 ## sales order creator agent.
-- model: Gemini 3.1 flash
+- model: gemini-3.1-flash
 - tools: `PostASalesorder`, `PostASalesorder___salesorder___ToItem`, `PostASalesorder___salesorder___ToPartner`, `PostASalesorder___salesorder___ToPricingelement`, `PostASalesorder___salesorder___ToText`, `PostASalesorder___salesorder___ToBillingplan`, `PostASalesorder___salesorder___ToPaymentplanitemdetails`, `PostASalesorder___salesorder___ToPrecedingprocflowdoc`, `PostASalesorder___salesorder___ToRelatedobject`, `PostASalesorder___salesorder___ToSubsequentprocflowdoc`
 - prompt: |
     You are a Sales Order Creator Agent with write access to the SAP Sales Order API (API_SALES_ORDER_SRV).
