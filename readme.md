@@ -3,6 +3,18 @@ SAP - Order-to-Cash (O2C) automation with Agent Development Kit (ADK)
 
 # MCP servers and tools
 
+
+## OpenAPI specification to MCP Server
+Using the `openapi-mcp-generator` tool we can generate MCP servers based on OpenAPI specifications. 
+example command:
+```
+openapi-mcp-generator \
+  --input ./sap_api/API_SALES_ORDER_SRV.json \
+  --output ./generated/API_SALES_ORDER_SRV \
+  --server-name API_SALES_ORDER_SRV \
+  --base-url http://256.256.256.11:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/
+```
+
 ## API_SALES_ORDER_SRV server
 ```
 GetASalesorder
