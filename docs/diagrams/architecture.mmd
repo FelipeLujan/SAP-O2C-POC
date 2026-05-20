@@ -1,0 +1,17 @@
+graph TD
+    User(("👤 User"))
+    SUP["🧠 sales_supervisor_agent\ngemini-2.5-pro"]
+    REV["🔍 sales_reviewer_agent\ngemini-flash · read-only"]
+    CRE["✏️ sales_order_creator_agent\ngemini-flash · write"]
+    MCP[("⚙️ SAP MCP Server\nnode index.js")]
+    SAP[("🏢 SAP OData API\nAPI_SALES_ORDER_SRV")]
+
+    User -->|message| SUP
+    SUP -->|"review / check / list"| REV
+    SUP -->|"create / add / apply"| CRE
+    REV -->|GET tools| MCP
+    CRE -->|POST tools| MCP
+    MCP <-->|HTTP OData| SAP
+    REV -->|summary| SUP
+    CRE -->|confirmation| SUP
+    SUP -->|final answer| User

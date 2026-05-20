@@ -1,0 +1,12 @@
+flowchart LR
+    msg(["User message"])
+    sup{"Supervisor\nclassifies intent"}
+    rev["Sales Reviewer\nreads order data"]
+    cre["Sales Order Creator\ncreates / populates order"]
+    ans(["Response to user"])
+
+    msg --> sup
+    sup -- "review / check / list" --> rev
+    sup -- "create / add / apply" --> cre
+    rev --> ans
+    cre --> ans

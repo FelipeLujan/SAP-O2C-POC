@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant U as User
+    participant S as Supervisor
+    participant C as Creator
+    participant R as Reviewer
+    participant M as MCP / SAP
+
+    U->>S: "Create a sales order for customer 17100003"
+    S->>C: delegate
+    C->>M: PostASalesorder
+    M-->>C: SalesOrder 6319
+    C->>M: PostASalesorder → ToItem (PUMP_MOTOR_KE × 2)
+    M-->>C: item created
+    C-->>S: "Order 6319 created with 1 item"
+    S-->>U: confirmation summary
+
+    U->>S: "Review order 6319"
+    S->>R: delegate
+    R->>M: GetASalesorder + ToItem + ToPricingelement
+    M-->>R: order data
+    R-->>S: structured summary
+    S-->>U: order overview

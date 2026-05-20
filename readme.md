@@ -1,21 +1,147 @@
-SAP - Order-to-Cash (O2C) automation with Agent Development Kit (ADK)
-==============================================================
+# SAP Order-to-Cash (O2C) Agent
 
-# MCP servers and tools
+> **Automate SAP sales order workflows** with a multi-agent system built on [Google ADK](https://google.github.io/adk-docs/) and the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
 
+---
 
-## OpenAPI specification to MCP Server
-Using the `openapi-mcp-generator` tool we can generate MCP servers based on OpenAPI specifications. 
-example command:
+## Overview
+
+This project implements an **Order-to-Cash automation agent team** that interacts with the SAP `API_SALES_ORDER_SRV` OData API.
+A supervisor agent classifies incoming requests and delegates to specialised sub-agents — one for reading data, one for creating orders.
+The SAP API is exposed to the agents through a generated TypeScript **MCP server**.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/architecture-dark.png">
+  <img src="docs/diagrams/architecture-light.png" alt="System architecture diagram" width="700">
+</picture>
+
+---
+
+## Repository Structure
+
+| Path | Description |
+|------|-------------|
+| `adk/O2C/` | Python ADK agent package (`pyproject.toml` + source) |
+| `adk/O2C/o2c_agent/agent.py` | Agent definitions (supervisor + sub-agents) |
+| `adk/O2C/o2c_agent/prompts.py` | System prompts for each agent |
+| `generated/API_SALES_ORDER_SRV/` | Auto-generated TypeScript MCP server |
+| `sap_api/` | OpenAPI / JSON specs for SAP OData services |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Agent framework | [Google ADK](https://google.github.io/adk-docs/) (`google-adk`) |
+| Agent models | `gemini-2.5-pro` (supervisor), `gemini-flash-latest` (sub-agents) |
+| Tool protocol | [Model Context Protocol](https://modelcontextprotocol.io/) (`mcp[cli]`) |
+| MCP server runtime | Node.js / TypeScript |
+| MCP server generator | [`openapi-mcp-generator`](https://www.npmjs.com/package/openapi-mcp-generator) |
+| SAP backend | SAP S/4HANA – `API_SALES_ORDER_SRV` (OData v2) |
+| Python env | `python-dotenv`, `hatchling` |
+
+---
+
+## Agent Team
+
+| Agent | Model | Access | Responsibility |
+|-------|-------|--------|----------------|
+| `sales_supervisor_agent` | `gemini-2.5-pro` | — | Classifies intent and routes to the right sub-agent |
+| `sales_reviewer_agent` | `gemini-flash-latest` | GET only | Retrieves and summarises sales orders and related data |
+| `sales_order_creator_agent` | `gemini-flash-latest` | POST only | Creates sales order headers, line items, and pricing conditions |
+
+### Request routing
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/routing-dark.png">
+  <img src="docs/diagrams/routing-light.png" alt="Request routing diagram" width="700">
+</picture>
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- Python ≥ 3.9 and Node.js ≥ 18
+- A Google AI API key (set `GOOGLE_API_KEY`)
+- Access to a SAP S/4HANA system with `API_SALES_ORDER_SRV` enabled
+
+### 1 — Install Python dependencies
+
+```bash
+cd adk/O2C
+python -m venv .venv && source .venv/bin/activate
+pip install -e .
 ```
+
+### 2 — Configure environment
+
+```bash
+cp .env.example .env   # then fill in your values
+```
+
+| Variable | Description |
+|----------|-------------|
+| `GOOGLE_API_KEY` | Google AI (Gemini) API key |
+| `BASIC_USERNAME_BASICAUTH` | SAP basic-auth username |
+| `BASIC_PASSWORD_BASICAUTH` | SAP basic-auth password |
+| `API_BASE_URL` | Full URL of the SAP OData service root |
+| `MCP_SERVER_JS` | Absolute path to `generated/API_SALES_ORDER_SRV/build/index.js` |
+
+### 3 — Build the MCP server
+
+```bash
+cd generated/API_SALES_ORDER_SRV
+npm install && npm run build
+```
+
+### 4 — Run the agent
+
+```bash
+cd adk/O2C
+adk run o2c_agent
+```
+
+---
+
+## MCP Server
+
+The TypeScript MCP server is generated from the SAP OpenAPI spec using [`openapi-mcp-generator`](https://www.npmjs.com/package/openapi-mcp-generator).
+
+### Regenerating from spec
+
+```bash
 openapi-mcp-generator \
-  --input ./sap_api/API_SALES_ORDER_SRV.json \
+  --input  ./sap_api/API_SALES_ORDER_SRV.json \
   --output ./generated/API_SALES_ORDER_SRV \
   --server-name API_SALES_ORDER_SRV \
-  --base-url http://256.256.256.11:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/
+  --base-url http://<host>:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/
 ```
 
-## API_SALES_ORDER_SRV server
+### Tools exposed per agent
+
+Each sub-agent receives an isolated MCP stdio process with a `tool_filter` applied:
+
+| Entity | Reviewer (GET) | Creator (POST) |
+|--------|:--------------:|:--------------:|
+| Sales Order header | `GetASalesorder` | `PostASalesorder` |
+| Line items (`ToItem`) | ✅ | ✅ |
+| Partners (`ToPartner`) | ✅ | ✅ |
+| Pricing elements (`ToPricingelement`) | ✅ | ✅ |
+| Header texts (`ToText`) | ✅ | ✅ |
+| Billing plan (`ToBillingplan`) | ✅ | ✅ |
+| Payment plan details (`ToPaymentplanitemdetails`) | ✅ | ✅ |
+| Preceding proc. flow doc | ✅ | ✅ |
+| Related objects | ✅ | ✅ |
+| Subsequent proc. flow doc | ✅ | ✅ |
+
+### Full tool list
+
+<details>
+<summary>Click to expand all <code>API_SALES_ORDER_SRV</code> tools</summary>
+
 ```
 GetASalesorder
 PostASalesorder
@@ -174,192 +300,75 @@ PatchASlsordpaymentplanitemdetails_salesorder___salesorder___paymentplanitem___p
 GetASlsordpaymentplanitemdetails_salesorder___salesorder___paymentplanitem___paymentplanitem___ToSalesorder
 PostRejectapprovalrequest
 PostReleaseapprovalrequest
-
 ```
 
+</details>
 
-Procedure
+---
 
-create a sales order by using tool 
-PostASalesorder
-body
+## Example Walkthrough
+
+The steps below demonstrate creating and enriching a sales order through the agent.
+
+### Step 1 — Create the order header
+
+The creator agent calls `PostASalesorder` with the minimum required fields:
+
 ```json
 {
-  "Salesorganization": "1710",
-  "Distributionchannel": "10",
-  "Organizationdivision": "00",
-  "Soldtoparty": "17100003"
+  "SalesOrganization": "1710",
+  "DistributionChannel": "10",
+  "OrganizationDivision": "00",
+  "SoldToParty": "17100003"
 }
 ```
-this step returned sales order number 6319. 
 
-this creates the the sales order record without any item. Then we can add items to the sales order by using the tool
-PostASalesorder___salesorder___ToItem
-body
+SAP returns a new sales order number (e.g. **6319**).
+
+### Step 2 — Add a line item
+
 ```json
 {
   "Material": "PUMP_MOTOR_KE",
-  "Requestedquantity": "2",
-  "Requestedquantityunit": "PC",
-  "Plant": "1710",
+  "RequestedQuantity": "2",
+  "RequestedQuantityUnit": "PC",
+  "Plant": "1710"
 }
-``` 
-PUMP_MOTOR_KE has an item price of 835 USD 
-
-Response: 
-
-```json
-{
-  "d": {
-    "__metadata": {
-      "id": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')",
-      "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')",
-      "type": "API_SALES_ORDER_SRV.A_SalesOrderType",
-      "etag": "W/\"datetimeoffset'2026-04-18T20%3A23%3A29.5937010Z'\""
-    },
-    "SalesOrder": "6319",
-    "SalesOrderType": "OR",
-    "SalesOrganization": "1710",
-    "DistributionChannel": "10",
-    "OrganizationDivision": "00",
-    "SalesGroup": "",
-    "SalesOffice": "",
-    "SalesDistrict": "",
-    "SoldToParty": "17100003",
-    "CreationDate": "/Date(1776470400000)/",
-    "CreatedByUser": "BPINST",
-    "LastChangeDate": "/Date(1776470400000)/",
-    "SenderBusinessSystemName": "",
-    "ExternalDocumentID": "",
-    "LastChangeDateTime": "/Date(1776543809593+0000)/",
-    "ExternalDocLastChangeDateTime": null,
-    "PurchaseOrderByCustomer": "",
-    "PurchaseOrderByShipToParty": "17100003",
-    "CustomerPurchaseOrderType": "",
-    "CustomerPurchaseOrderDate": null,
-    "SalesOrderDate": "/Date(1776470400000)/",
-    "TotalNetAmount": "1670.00",
-    "OverallDeliveryStatus": "A",
-    "TotalBlockStatus": "",
-    "OverallOrdReltdBillgStatus": "",
-    "OverallSDDocReferenceStatus": "",
-    "TransactionCurrency": "USD",
-    "SDDocumentReason": "",
-    "PricingDate": "/Date(1776470400000)/",
-    "PriceDetnExchangeRate": "1.00000",
-    "PaymentGuaranteeProcedure": "000002",
-    "BillingPlan": "",
-    "RequestedDeliveryDate": "/Date(1776470400000)/",
-    "ShippingCondition": "01",
-    "CompleteDeliveryIsDefined": false,
-    "ShippingType": "",
-    "HeaderBillingBlockReason": "",
-    "DeliveryBlockReason": "",
-    "DeliveryDateTypeRule": "",
-    "IncotermsClassification": "EXW",
-    "IncotermsTransferLocation": "Palo Alto",
-    "IncotermsLocation1": "Palo Alto",
-    "IncotermsLocation2": "",
-    "IncotermsVersion": "",
-    "CustomerPriceGroup": "",
-    "PriceListType": "",
-    "CustomerPaymentTerms": "0004",
-    "PaymentMethod": "",
-    "FixedValueDate": null,
-    "AssignmentReference": "",
-    "ReferenceSDDocument": "",
-    "ReferenceSDDocumentCategory": "",
-    "AccountingDocExternalReference": "",
-    "CustomerAccountAssignmentGroup": "01",
-    "AccountingExchangeRate": "0.00000",
-    "CorrespncExternalReference": "",
-    "SlsDocSo2PLastContactPersnName": "",
-    "SlsDocSo2PLstCntctPersnTelNmbr": "999-654-2356",
-    "POCorrespncExternalReference": "",
-    "CustomerConditionGroup1": "",
-    "CustomerConditionGroup2": "",
-    "CustomerConditionGroup3": "",
-    "CustomerConditionGroup4": "",
-    "CustomerConditionGroup5": "",
-    "CustomerGroup": "01",
-    "AdditionalCustomerGroup1": "",
-    "AdditionalCustomerGroup2": "",
-    "AdditionalCustomerGroup3": "",
-    "AdditionalCustomerGroup4": "",
-    "AdditionalCustomerGroup5": "",
-    "SlsDocIsRlvtForProofOfDeliv": true,
-    "CustomerTaxClassification1": "",
-    "CustomerTaxClassification2": "",
-    "CustomerTaxClassification3": "",
-    "CustomerTaxClassification4": "",
-    "CustomerTaxClassification5": "",
-    "CustomerTaxClassification6": "",
-    "CustomerTaxClassification7": "",
-    "CustomerTaxClassification8": "",
-    "CustomerTaxClassification9": "",
-    "TaxDepartureCountry": "",
-    "VATRegistrationCountry": "",
-    "SalesOrderApprovalReason": "",
-    "SalesDocApprovalStatus": "",
-    "OverallSDProcessStatus": "A",
-    "TotalCreditCheckStatus": "",
-    "OverallTotalDeliveryStatus": "A",
-    "OverallSDDocumentRejectionSts": "A",
-    "BillingDocumentDate": "/Date(1776470400000)/",
-    "ContractAccount": "",
-    "AdditionalValueDays": "0",
-    "CustomerPurchaseOrderSuplmnt": "",
-    "ServicesRenderedDate": null,
-    "to_BillingPlan": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_BillingPlan"
-      }
-    },
-    "to_Item": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_Item"
-      }
-    },
-    "to_Partner": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_Partner"
-      }
-    },
-    "to_PaymentPlanItemDetails": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_PaymentPlanItemDetails"
-      }
-    },
-    "to_PrecedingProcFlowDoc": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_PrecedingProcFlowDoc"
-      }
-    },
-    "to_PricingElement": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_PricingElement"
-      }
-    },
-    "to_RelatedObject": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_RelatedObject"
-      }
-    },
-    "to_SubsequentProcFlowDoc": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_SubsequentProcFlowDoc"
-      }
-    },
-    "to_Text": {
-      "__deferred": {
-        "uri": "http://34.95.14.112:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('6319')/to_Text"
-      }
-    }
-  }
-}
-
 ```
 
+`PUMP_MOTOR_KE` has a unit price of **835 USD** → total net amount **1,670 USD**.
 
+### Step 3 — Apply pricing conditions
 
-apply a discount and shipping fees to the sales order 6319 using 
+| Condition | Type | Value |
+|-----------|------|-------|
+| Customer discount | `K007` | −5 % |
+| Freight surcharge | `KF00` | +25 USD |
+
+Call `PostASalesorder___salesorder___ToPricingelement` once per condition row.
+
+### Step 4 — Review the order
+
+Ask the supervisor: *"Review sales order 6319"*  
+The reviewer agent fetches the header, items, and pricing elements and returns a structured summary.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/sequence-dark.png">
+  <img src="docs/diagrams/sequence-light.png" alt="Example walkthrough sequence diagram" width="700">
+</picture>
+
+---
+
+## Design Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| Supervisor uses `gemini-2.5-pro` | Higher reasoning for intent classification and multi-step orchestration |
+| Sub-agents use `gemini-flash-latest` | Faster, cheaper model sufficient for structured tool-calling tasks |
+| Each sub-agent gets its own MCP process | Isolated stdio connections; `tool_filter` enforces read/write separation |
+| Reviewer is strictly read-only | Prevents accidental mutations; only `GET` tools are exposed |
+| Creator is strictly write-only | Prevents acting on stale state without the supervisor's knowledge |
+
+---
+
+> See [adk/O2C/readme.md](adk/O2C/readme.md) for detailed agent prompts and inner architecture notes.
