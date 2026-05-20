@@ -3,6 +3,100 @@ implement an agent team composed of:
   - sales reviewer agent
   - sales order creator
 
+---
+
+## Team Composition
+
+The O2C agent team is a **supervisor/sub-agent** architecture built with [Google ADK](https://adk.dev).
+A single root agent (the supervisor) delegates every request to a specialised sub-agent
+that owns the right set of SAP MCP tools for the job.
+
+### Agent hierarchy
+
+```mermaid
+graph TD
+    User(("👤 User"))
+    SUP["🧠 sales_supervisor_agent<br/><sub>gemini-2.5-pro</sub>"]
+    REV["🔍 sales_reviewer_agent<br/><sub>gemini-2.5-flash · read-only</sub>"]
+    CRE["✏️ sales_order_creator_agent<br/><sub>gemini-2.5-flash · write</sub>"]
+    MCP[("⚙️ SAP MCP Server<br/><sub>node index.js</sub>")]
+
+    User -->|message| SUP
+    SUP -->|delegate read request| REV
+    SUP -->|delegate create request| CRE
+    REV -->|GET tools| MCP
+    CRE -->|POST tools| MCP
+    MCP -->|OData response| REV
+    MCP -->|OData response| CRE
+    REV -->|summary| SUP
+    CRE -->|confirmation| SUP
+    SUP -->|final answer| User
+```
+
+### Request routing
+
+```mermaid
+flowchart LR
+    msg(["User message"])
+    sup{"Supervisor\nclassifies intent"}
+    rev["Sales Reviewer\nreads order data"]
+    cre["Sales Order Creator\ncreates / populates order"]
+    ans(["Response to user"])
+
+    msg --> sup
+    sup -- "review / check / list" --> rev
+    sup -- "create / add item / apply discount" --> cre
+    rev --> ans
+    cre --> ans
+```
+
+### MCP tool access per agent
+
+```mermaid
+block-beta
+  columns 3
+
+  block:reviewer["🔍 Sales Reviewer"]:1
+    GetASalesorder
+    GetToItem["GetASalesorder → ToItem"]
+    GetToPartner["GetASalesorder → ToPartner"]
+    GetToPricingelement["GetASalesorder → ToPricingelement"]
+    GetToText["GetASalesorder → ToText"]
+    GetToBillingplan["GetASalesorder → ToBillingplan"]
+    GetToPaymentplanitemdetails["→ ToPaymentplanitemdetails"]
+    GetToPrecedingprocflowdoc["→ ToPrecedingprocflowdoc"]
+    GetToRelatedobject["→ ToRelatedobject"]
+    GetToSubsequentprocflowdoc["→ ToSubsequentprocflowdoc"]
+  end
+
+  space
+
+  block:creator["✏️ Sales Order Creator"]:1
+    PostASalesorder
+    PostToItem["PostASalesorder → ToItem"]
+    PostToPartner["PostASalesorder → ToPartner"]
+    PostToPricingelement["PostASalesorder → ToPricingelement"]
+    PostToText["PostASalesorder → ToText"]
+    PostToBillingplan["PostASalesorder → ToBillingplan"]
+    PostToPaymentplanitemdetails["→ ToPaymentplanitemdetails"]
+    PostToPrecedingprocflowdoc["→ ToPrecedingprocflowdoc"]
+    PostToRelatedobject["→ ToRelatedobject"]
+    PostToSubsequentprocflowdoc["→ ToSubsequentprocflowdoc"]
+  end
+```
+
+### Key design decisions
+
+| Decision | Rationale |
+|---|---|
+| Supervisor uses `gemini-2.5-pro` | Higher reasoning capacity for intent classification and multi-step orchestration |
+| Sub-agents use `gemini-2.5-flash` | Faster, cheaper model is sufficient for structured tool-calling tasks |
+| Each sub-agent gets its own MCP process | Isolated stdio connections; `tool_filter` enforces read/write separation at the toolset level |
+| Reviewer is strictly read-only | Prevents accidental mutations; only `GET` tools are exposed |
+| Creator is strictly write-only | Prevents the creator from reading stale state and acting on it without the supervisor's knowledge |
+
+---
+
 ## sales supervisor agent
 - model: gemini-3.1-pro
 - subagents:

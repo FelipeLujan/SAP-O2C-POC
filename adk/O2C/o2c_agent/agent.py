@@ -90,7 +90,7 @@ _REVIEWER_TOOLS = [
 
 sales_reviewer_agent = Agent(
     name="sales_reviewer_agent",
-    model="gemini-2.5-flash",
+    model="gemini-flash-latest",
     description=(
         "Read-only agent that retrieves and summarises SAP sales orders, "
         "line items, partners, pricing elements, billing plans, and process flows."
@@ -117,7 +117,7 @@ _CREATOR_TOOLS = [
 
 sales_order_creator_agent = Agent(
     name="sales_order_creator_agent",
-    model="gemini-2.5-flash",
+    model="gemini-flash-latest",
     description=(
         "Write agent that creates SAP sales order headers, line items, partners, "
         "pricing conditions, billing plans, and header texts."
