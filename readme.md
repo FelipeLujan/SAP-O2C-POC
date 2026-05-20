@@ -1,57 +1,13 @@
-# SAP Order-to-Cash (O2C) Agent
+# SAP O2C Agent
 
-> **Automate SAP sales order workflows** with a multi-agent system built on [Google ADK](https://google.github.io/adk-docs/) and the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
-
----
-
-## Overview
-
-This project implements an **Order-to-Cash automation agent team** that interacts with the SAP `API_SALES_ORDER_SRV` OData API.
-A supervisor agent classifies incoming requests and delegates to specialised sub-agents — one for reading data, one for creating orders.
-The SAP API is exposed to the agents through a generated TypeScript **MCP server**.
+A conversational agent that creates and reviews SAP sales orders. You talk to it in plain English; it figures out whether to read or write and calls the right SAP OData endpoints through an MCP server.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/architecture-dark.png">
   <img src="docs/diagrams/architecture-light.png" alt="System architecture diagram" width="700">
 </picture>
 
----
-
-## Repository Structure
-
-| Path | Description |
-|------|-------------|
-| `adk/O2C/` | Python ADK agent package (`pyproject.toml` + source) |
-| `adk/O2C/o2c_agent/agent.py` | Agent definitions (supervisor + sub-agents) |
-| `adk/O2C/o2c_agent/prompts.py` | System prompts for each agent |
-| `generated/API_SALES_ORDER_SRV/` | Auto-generated TypeScript MCP server |
-| `sap_api/` | OpenAPI / JSON specs for SAP OData services |
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Agent framework | [Google ADK](https://google.github.io/adk-docs/) (`google-adk`) |
-| Agent models | `gemini-2.5-pro` (supervisor), `gemini-flash-latest` (sub-agents) |
-| Tool protocol | [Model Context Protocol](https://modelcontextprotocol.io/) (`mcp[cli]`) |
-| MCP server runtime | Node.js / TypeScript |
-| MCP server generator | [`openapi-mcp-generator`](https://www.npmjs.com/package/openapi-mcp-generator) |
-| SAP backend | SAP S/4HANA – `API_SALES_ORDER_SRV` (OData v2) |
-| Python env | `python-dotenv`, `hatchling` |
-
----
-
-## Agent Team
-
-| Agent | Model | Access | Responsibility |
-|-------|-------|--------|----------------|
-| `sales_supervisor_agent` | `gemini-2.5-pro` | — | Classifies intent and routes to the right sub-agent |
-| `sales_reviewer_agent` | `gemini-flash-latest` | GET only | Retrieves and summarises sales orders and related data |
-| `sales_order_creator_agent` | `gemini-flash-latest` | POST only | Creates sales order headers, line items, and pricing conditions |
-
-### Request routing
+There are three agents under the hood. A **supervisor** (Gemini 2.5 Pro) reads your message and decides which sub-agent to call. The **reviewer** (Gemini Flash) has access to all the `GET` endpoints and returns summaries. The **creator** (Gemini Flash) has access to the `POST` endpoints and handles new orders. Each sub-agent gets its own isolated MCP process, so the reviewer can never accidentally write data and the creator never reads stale state on its own.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/routing-dark.png">
@@ -60,15 +16,11 @@ The SAP API is exposed to the agents through a generated TypeScript **MCP server
 
 ---
 
-## Quick Start
+## Setup
 
-### Prerequisites
+You need Python ≥ 3.9, Node.js ≥ 18, and a Gemini API key.
 
-- Python ≥ 3.9 and Node.js ≥ 18
-- A Google AI API key (set `GOOGLE_API_KEY`)
-- Access to a SAP S/4HANA system with `API_SALES_ORDER_SRV` enabled
-
-### 1 — Install Python dependencies
+**1. Install the Python package**
 
 ```bash
 cd adk/O2C
@@ -76,28 +28,26 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e .
 ```
 
-### 2 — Configure environment
+**2. Set your environment variables**
 
-```bash
-cp .env.example .env   # then fill in your values
-```
+Copy `.env.example` to `.env` and fill in your values:
 
-| Variable | Description |
-|----------|-------------|
-| `GOOGLE_API_KEY` | Google AI (Gemini) API key |
-| `BASIC_USERNAME_BASICAUTH` | SAP basic-auth username |
-| `BASIC_PASSWORD_BASICAUTH` | SAP basic-auth password |
-| `API_BASE_URL` | Full URL of the SAP OData service root |
+| Variable | What to put here |
+|----------|-----------------|
+| `GOOGLE_API_KEY` | Your Gemini API key |
+| `BASIC_USERNAME_BASICAUTH` | SAP username |
+| `BASIC_PASSWORD_BASICAUTH` | SAP password |
+| `API_BASE_URL` | e.g. `http://your-sap-host:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/` |
 | `MCP_SERVER_JS` | Absolute path to `generated/API_SALES_ORDER_SRV/build/index.js` |
 
-### 3 — Build the MCP server
+**3. Build the MCP server**
 
 ```bash
 cd generated/API_SALES_ORDER_SRV
 npm install && npm run build
 ```
 
-### 4 — Run the agent
+**4. Start the agent**
 
 ```bash
 cd adk/O2C
@@ -106,41 +56,96 @@ adk run o2c_agent
 
 ---
 
-## MCP Server
+## How to use it
 
-The TypeScript MCP server is generated from the SAP OpenAPI spec using [`openapi-mcp-generator`](https://www.npmjs.com/package/openapi-mcp-generator).
+Once the agent is running, just type what you want. Some examples:
 
-### Regenerating from spec
+```
+> Review sales order 6319
+> Create a sales order for customer 17100003
+> Add 2 units of PUMP_MOTOR_KE (plant 1710) to order 6319
+> Apply a 5% discount to order 6319
+> What's the delivery status on order 6319?
+```
+
+The supervisor reads your message, picks the right sub-agent, and streams back the result.
+
+### Creating a sales order end-to-end
+
+Here's what a full create-and-review flow looks like:
+
+**1.** Ask the agent to create an order. The minimum it needs is sales org, distribution channel, division, and a sold-to party:
+
+```
+> Create a sales order: sales org 1710, distribution channel 10, division 00, sold-to 17100003
+```
+
+The creator calls `PostASalesorder` and reports back the new order number (e.g. **6319**).
+
+**2.** Add a line item:
+
+```
+> Add material PUMP_MOTOR_KE, quantity 2 PC, plant 1710 to order 6319
+```
+
+Unit price is 835 USD, so the order total becomes **1,670 USD**.
+
+**3.** Apply pricing conditions:
+
+```
+> Apply a 5% customer discount and a 25 USD freight charge to order 6319
+```
+
+The creator posts two rows to `ToPricingelement` — condition types `K007` and `KF00`.
+
+**4.** Review the finished order:
+
+```
+> Review order 6319
+```
+
+The reviewer fetches the header, line items, and pricing elements and returns a plain-English summary.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/sequence-dark.png">
+  <img src="docs/diagrams/sequence-light.png" alt="Example walkthrough sequence diagram" width="700">
+</picture>
+
+---
+
+## Regenerating the MCP server
+
+The MCP server in `generated/API_SALES_ORDER_SRV/` is generated from the OpenAPI spec in `sap_api/`. If SAP updates the API or you want to point at a different service, regenerate it with:
 
 ```bash
 openapi-mcp-generator \
   --input  ./sap_api/API_SALES_ORDER_SRV.json \
   --output ./generated/API_SALES_ORDER_SRV \
   --server-name API_SALES_ORDER_SRV \
-  --base-url http://<host>:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/
+  --base-url http://<your-sap-host>:50000/sap/opu/odata/sap/API_SALES_ORDER_SRV/
 ```
 
-### Tools exposed per agent
+Then rebuild: `cd generated/API_SALES_ORDER_SRV && npm run build`.
 
-Each sub-agent receives an isolated MCP stdio process with a `tool_filter` applied:
+The reviewer only gets the `Get*` tools; the creator only gets the `Post*` tools. That's controlled by the `tool_filter` list in `adk/O2C/o2c_agent/agent.py`.
 
-| Entity | Reviewer (GET) | Creator (POST) |
-|--------|:--------------:|:--------------:|
-| Sales Order header | `GetASalesorder` | `PostASalesorder` |
-| Line items (`ToItem`) | ✅ | ✅ |
-| Partners (`ToPartner`) | ✅ | ✅ |
-| Pricing elements (`ToPricingelement`) | ✅ | ✅ |
-| Header texts (`ToText`) | ✅ | ✅ |
-| Billing plan (`ToBillingplan`) | ✅ | ✅ |
-| Payment plan details (`ToPaymentplanitemdetails`) | ✅ | ✅ |
-| Preceding proc. flow doc | ✅ | ✅ |
-| Related objects | ✅ | ✅ |
-| Subsequent proc. flow doc | ✅ | ✅ |
+### Available tools per agent
 
-### Full tool list
+| SAP resource | Reviewer | Creator |
+|---|:-:|:-:|
+| Sales order header | GET | POST |
+| Line items | GET | POST |
+| Partners | GET | POST |
+| Pricing elements | GET | POST |
+| Header texts | GET | POST |
+| Billing plan | GET | POST |
+| Payment plan details | GET | POST |
+| Preceding process flow doc | GET | — |
+| Related objects | GET | POST |
+| Subsequent process flow doc | GET | — |
 
 <details>
-<summary>Click to expand all <code>API_SALES_ORDER_SRV</code> tools</summary>
+<summary>Full tool list (all <code>API_SALES_ORDER_SRV</code> endpoints)</summary>
 
 ```
 GetASalesorder
@@ -306,69 +311,5 @@ PostReleaseapprovalrequest
 
 ---
 
-## Example Walkthrough
+> See [adk/O2C/readme.md](adk/O2C/readme.md) for the full agent prompts.
 
-The steps below demonstrate creating and enriching a sales order through the agent.
-
-### Step 1 — Create the order header
-
-The creator agent calls `PostASalesorder` with the minimum required fields:
-
-```json
-{
-  "SalesOrganization": "1710",
-  "DistributionChannel": "10",
-  "OrganizationDivision": "00",
-  "SoldToParty": "17100003"
-}
-```
-
-SAP returns a new sales order number (e.g. **6319**).
-
-### Step 2 — Add a line item
-
-```json
-{
-  "Material": "PUMP_MOTOR_KE",
-  "RequestedQuantity": "2",
-  "RequestedQuantityUnit": "PC",
-  "Plant": "1710"
-}
-```
-
-`PUMP_MOTOR_KE` has a unit price of **835 USD** → total net amount **1,670 USD**.
-
-### Step 3 — Apply pricing conditions
-
-| Condition | Type | Value |
-|-----------|------|-------|
-| Customer discount | `K007` | −5 % |
-| Freight surcharge | `KF00` | +25 USD |
-
-Call `PostASalesorder___salesorder___ToPricingelement` once per condition row.
-
-### Step 4 — Review the order
-
-Ask the supervisor: *"Review sales order 6319"*  
-The reviewer agent fetches the header, items, and pricing elements and returns a structured summary.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/sequence-dark.png">
-  <img src="docs/diagrams/sequence-light.png" alt="Example walkthrough sequence diagram" width="700">
-</picture>
-
----
-
-## Design Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| Supervisor uses `gemini-2.5-pro` | Higher reasoning for intent classification and multi-step orchestration |
-| Sub-agents use `gemini-flash-latest` | Faster, cheaper model sufficient for structured tool-calling tasks |
-| Each sub-agent gets its own MCP process | Isolated stdio connections; `tool_filter` enforces read/write separation |
-| Reviewer is strictly read-only | Prevents accidental mutations; only `GET` tools are exposed |
-| Creator is strictly write-only | Prevents acting on stale state without the supervisor's knowledge |
-
----
-
-> See [adk/O2C/readme.md](adk/O2C/readme.md) for detailed agent prompts and inner architecture notes.
